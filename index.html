@@ -19,10 +19,11 @@
 </div>
 <div class="row">
 
-    <div id="sideMenu"  class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
+    <div id="sideMenu" class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
         <div>
             <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle btn-block" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-secondary dropdown-toggle btn-block" type="button" id="dropdownMenu2"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Filter
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
@@ -31,14 +32,9 @@
                     <button class="dropdown-item" type="button">Something else here</button>
                 </div>
             </div>
-            <div class="list-group">
-                <a href="#" class="list-group-item active" id="test">
-                    Cras justo odio
-                </a>
-                <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
-                <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
-                <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
-                <a href="#"  data-bind="template: {name:'pin', foreach: filterPins}" class="list-group-item list-group-item-action disabled">Vestibulum at eros</a>
+            <div class="list-group" data-bind="foreach: markersList">
+                <a href="#" data-bind="text: title" class="list-group-item"> Cras justo odio</a>
+
 
             </div>
         </div>
@@ -67,33 +63,27 @@
 <script>
     //blank array for the listing markers
     var markers = [];
-    var map;
+    var mapGlobal;
+    var largeInfowindow;
+//    var googleObj;
 
-    function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
+    var initMap = function () {
+        mapGlobal = new google.maps.Map(document.getElementById('map'), {
             zoom: 17,
             center: {lat: 24.714178, lng: 46.632500}
         });
-        var locations = [
-            {title: 'macdonalds', location: {lat: 24.713384,lng: 46.633396}},
-            {title: 'Shawarmer', location: {lat: 24.713122,lng: 46.633899}},
-            {title: 'The Body Shop', location: {lat: 24.713855,lng: 46.633980}},
-            {title: 'SUBWAY', location: {lat: 24.714625,lng: 46.634592}},
-            {title: 'Dunkin Donuts', location: {lat: 24.713335,lng: 46.634071}},
-            {title: 'Al Kitab Roundabout', location: {lat: 24.714859,lng: 46.631706}},
-            {title: 'TamimlargeInfowindowlargeInfowindowlargeInfowindowlargeInfowindowlargeInfowindowlargeInfowindowi Markets', location: {lat: 24.713611,lng: 46.633948}},
-        ];
-
-        var largeInfowindow = new google.maps.InfoWindow();
+//        largeInfowindow = new google.maps.InfoWindow();
+//        googleObj = google;
+        largeInfowindow = new google.maps.InfoWindow();
 
         //loop through the locations to make markers
-        for(var i =0; i< locations.length; i++){
+        for (var i = 0; i < locations.length; i++) {
             // get the positions and title from the locations array
             var position = locations[i].location;
             var title = locations[i].title;
             // creat marker per location and push into the markers array
             var marker = new google.maps.Marker({
-                map: map,
+                map: mapGlobal,
                 position: position,
                 title: title,
                 animation: google.maps.Animation.DROP,
@@ -104,7 +94,7 @@
             // exted the boundries of the map for each marker
 //            bounds.extend(marker.position);
             // create an onClick event to open an infowindow at each marker.
-            marker.addListener('click', function(){
+            marker.addListener('click', function () {
                 populateInfoWindow(this, largeInfowindow);
             });
         }
@@ -115,7 +105,7 @@
             if (infowindow.marker != marker) {
                 infowindow.marker = marker;
                 infowindow.setContent('<div>' + marker.title + '</div>');
-                infowindow.open(map, marker);
+                infowindow.open(mapGlobal, marker);
                 // make sure the marker property is cleared if the infowindow is closed.
 //                infowindow.addListener('closeclick', function(){
 //                    infowindow.setMarker(null);
@@ -123,35 +113,74 @@
             }
         }
 
-        var marker;
-        marker = function (data) {
-            this.title = ko.observable(data.title);
-            this.position = ko.observable(data.location);
-            this.active = ko.computed(function (show) {
+    }
 
-            });
+    var locations = [
+        {id: 1, title: 'macdonalds', location: {lat: 24.713384, lng: 46.633396}},
+        {id: 2, title: 'Shawarmer', location: {lat: 24.713122, lng: 46.633899}},
+        {id: 3, title: 'The Body Shop', location: {lat: 24.713855, lng: 46.633980}},
+        {id: 4, title: 'SUBWAY', location: {lat: 24.714625, lng: 46.634592}},
+        {id: 5, title: 'Dunkin Donuts', location: {lat: 24.713335, lng: 46.634071}},
+        {id: 6, title: 'Al Kitab Roundabout', location: {lat: 24.714859, lng: 46.631706}},
+        {
+            id: 7,
+            title: 'Tamimi Markets',
+            location: {lat: 24.713611, lng: 46.633948}
         }
+    ];
+
+    var Marker = function (data) {
+        var self = this;
+        this.title = ko.observable(data.title);
+        this.position = ko.observable(data.location);
+        this.map = ko.observable(data.map);
+//        this.markerObj = new google.maps.Marker({
+//            map: map,
+//            position: position,
+//            title: title,
+//            animation: google.maps.Animation.DROP,
+//            id: data.id
+//        });
+
+//        this.populateInfoWindow = function(){ initMap().populateInfoWindow(data,largeInfowindow);};
+//        this.populateInfoWindow = function (data, largeInfowindow) {
+//            // check to make sure the infowindow is not already opened on this marker.
+//            if (largeInfowindow.marker != data) {
+//                largeInfowindow.marker = data;
+//                largeInfowindow.setContent('<div>' + data.title + '</div>');
+//                largeInfowindow.open(map, data);
+//                // make sure the marker property is cleared if the infowindow is closed.
+//    //                infowindow.addListener('closeclick', function(){
+//    //                    infowindow.setMarker(null);
+//    //                });
+//            }
+//        };
+//        this.active = function (show) {
+//            if (show == true)
+//                self.markerObj.setMap(map);
+//            else
+//                self.markerObj.setMap(null);
+//        };
+
+    };
 
 
-        new google.maps.Marker({
-            map: map,
-            position: {lat: 24.713186, lng: 46.633843},
-            title: 'teest tesst',
-            animation: google.maps.Animation.DROP,
-            id: 8
+    var ViewModel = function () {
+        var self = this;
+
+        this.markersList = ko.observableArray([]);
+
+        locations.forEach(function(markerItem){
+            self.markersList.push( new Marker(markerItem) );
         });
 
+//        this.currentMarker = ko.observable( this.markersList()[0]);
 
-        var ViewModel = function() {
+    };
+
+    ko.applyBindings(new ViewModel());
 
 
-
-
-        };
-
-        ko.applyBindings(new ViewModel());
-
-    }
 </script>
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAImzHssZtEyY5LktnEH5kHFmSk5InoX_4&callback=initMap">
