@@ -3,17 +3,6 @@ body {
     padding: 0;
 }
 
-.main {
-    display: inline-block;
-}
-
-#sideMenu {
-
-    padding: auto 0 0 0;
-    margin: 0;
-
-}
-
 #map {
     height: 400px;
     width: 100%;

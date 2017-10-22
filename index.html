@@ -21,38 +21,25 @@
 
     <div id="sideMenu" class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
         <div>
-            <!--<div class="dropdown">-->
-                <!--<button class="btn btn-secondary dropdown-toggle btn-block" type="button" id="dropdownMenu2"-->
-                        <!--data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-                    <!--Filter-->
-                <!--</button>-->
-                <!--<div class="dropdown-menu" aria-labelledby="dropdownMenu2">-->
-                    <!--<button class="dropdown-item" type="button">Action</button>-->
-                    <!--<button class="dropdown-item" type="button">Another action</button>-->
-                    <!--<button class="dropdown-item" type="button">Something else here</button>-->
-                <!--</div>-->
-            <!--</div>-->
             <div class="input-group input-group-lg">
                 <input type="text" class="form-control" placeholder="search..." data-bind="textInput: filter">
             </div>
             <div class="list-group" data-bind="foreach: visiblePlaces">
-                <a href="#" data-bind="text: title" class="list-group-item"> Cras justo odio</a>
+                <a href="#" data-bind="text: title, click: bounce" class="list-group-item"> Cras justo odio</a>
             </div>
         </div>
     </div>
-
     <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12 col-xs-12">
         <div class="map ">
             <div id="map"></div>
         </div>
     </div>
-
 </div>
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
         integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
@@ -61,149 +48,10 @@
         integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+<script src="app.js"></script>
 <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAImzHssZtEyY5LktnEH5kHFmSk5InoX_4&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAImzHssZtEyY5LktnEH5kHFmSk5InoX_4&callback=initMap" onerror="googleMapsAPIError()">
 </script>
-<script>
-    //blank array for the listing markers
-    var markers = [];
-    var mapGlobal;
-    var largeInfowindow;
-//    var googleObj;
-
-    var initMap = function () {
-        mapGlobal = new google.maps.Map(document.getElementById('map'), {
-            zoom: 17,
-            center: {lat: 24.714178, lng: 46.632500}
-        });
-//        largeInfowindow = new google.maps.InfoWindow();
-//        googleObj = google;
-        largeInfowindow = new google.maps.InfoWindow();
-
-        //loop through the locations to make markers
-        for (var i = 0; i < locations.length; i++) {
-            // get the positions and title from the locations array
-            var position = locations[i].location;
-            var title = locations[i].title;
-            // creat marker per location and push into the markers array
-            var marker = new google.maps.Marker({
-                map: mapGlobal,
-                position: position,
-                title: title,
-                animation: google.maps.Animation.DROP,
-                id: i
-            });
-            //push the marker into the array
-            markers.push(marker);
-            // exted the boundries of the map for each marker
-//            bounds.extend(marker.position);
-            // create an onClick event to open an infowindow at each marker.
-            marker.addListener('click', function () {
-                populateInfoWindow(this, largeInfowindow);
-            });
-        }
-        //function to populate the infowindow when the marker is clicked.
-        //one infowindow will be open when clicked, and populate based on the markers position.
-        function populateInfoWindow(marker, infowindow) {
-            // check to make sure the infowindow is not already opened on this marker.
-            if (infowindow.marker != marker) {
-                infowindow.marker = marker;
-                infowindow.setContent('<div>' + marker.title + '</div>');
-                infowindow.open(mapGlobal, marker);
-                // make sure the marker property is cleared if the infowindow is closed.
-//                infowindow.addListener('closeclick', function(){
-//                    infowindow.setMarker(null);
-//                });
-            }
-        }
-
-    }
-
-    var locations = [
-        {id: 1, title: 'macdonalds', location: {lat: 24.713384, lng: 46.633396}},
-        {id: 2, title: 'Shawarmer', location: {lat: 24.713122, lng: 46.633899}},
-        {id: 3, title: 'The Body Shop', location: {lat: 24.713855, lng: 46.633980}},
-        {id: 4, title: 'SUBWAY', location: {lat: 24.714625, lng: 46.634592}},
-        {id: 5, title: 'Dunkin Donuts', location: {lat: 24.713335, lng: 46.634071}},
-        {id: 6, title: 'Al Kitab Roundabout', location: {lat: 24.714859, lng: 46.631706}},
-        {
-            id: 7,
-            title: 'Tamimi Markets',
-            location: {lat: 24.713611, lng: 46.633948}
-        }
-    ];
-
-    var Marker = function (data) {
-        var self = this;
-        this.title = ko.observable(data.title);
-        this.position = ko.observable(data.location);
-        this.map = ko.observable(data.map);
-        this.show = function(show) {
-            if (show == true)
-                data.setMap(mapGlobal);
-            else
-                data.setMap(null);
-        };
-//        this.markerObj = new google.maps.Marker({
-//            map: map,
-//            position: position,
-//            title: title,
-//            animation: google.maps.Animation.DROP,
-//            id: data.id
-//        });
-
-//        this.populateInfoWindow = function(){ initMap().populateInfoWindow(data,largeInfowindow);};
-//        this.populateInfoWindow = function (data, largeInfowindow) {
-//            // check to make sure the infowindow is not already opened on this marker.
-//            if (largeInfowindow.marker != data) {
-//                largeInfowindow.marker = data;
-//                largeInfowindow.setContent('<div>' + data.title + '</div>');
-//                largeInfowindow.open(map, data);
-//                // make sure the marker property is cleared if the infowindow is closed.
-//    //                infowindow.addListener('closeclick', function(){
-//    //                    infowindow.setMarker(null);
-//    //                });
-//            }
-//        };
-//        this.active = function (show) {
-//            if (show == true)
-//                self.markerObj.setMap(map);
-//            else
-//                self.markerObj.setMap(null);
-//        };
-
-    };
-
-
-    var ViewModel = function () {
-        var self = this;
-
-        self.places = ko.observableArray(locations);
-        this.filter = ko.observable();
-        this.visiblePlaces = ko.computed(function() {
-            return this.places().filter(function(place) {
-                if (!self.filter() || place.title.toLowerCase().indexOf(self.filter().toLowerCase()) !== -1){
-                    place.map = null;
-                    return place;
-                }
-
-            });
-        }, this);
-//        this.markersList = ko.observableArray([]);
-//
-//        locations.forEach(function(markerItem){
-//            self.markersList.push( new Marker(markerItem) );
-//        });
-//
-////        this.currentMarker = ko.observable( this.markersList()[0]);
-
-    };
-
-    ko.applyBindings(new ViewModel());
-
-
-</script>
-
 
 </body>
 </html>
