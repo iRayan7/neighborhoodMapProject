@@ -49,7 +49,6 @@ Marker = function (data) {
         self.address = results.location.formattedAddress[0] || 'No Address Found';
         self.phone = (results.contact.phone || 'No Phone Found');
     }).fail(function () {
-        // TODO: show an eroor popup
         $('#map').html('There is an error with foursquare api, please refresh the page');
     });
 
@@ -96,9 +95,14 @@ Marker = function (data) {
 
         self.infoWindow.open(map, this);
 
+        self.mapMarker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function() {
+            self.mapMarker.setAnimation(null);
+        }, 1500);
+
     });
 
-    this.bounce = function(marker) {
+    this.trigger = function(marker) {
         google.maps.event.trigger(self.mapMarker, 'click');
     };
 
